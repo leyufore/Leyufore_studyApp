@@ -1,3 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">CoolVideoPlayer</string>
+    <string name="app_name">酷视播放器</string>
+
+    <!-- 界面提示 -->
+    <string name="msg_nodatamsg">暂无数据</string>
+
+    <!-- 程序警告  -->
+    <string name="warning_title">警告</string>
+    <string name="warning_app_exit_yesno">是否真的要关闭程序？</string>
+
+    <!-- 功能按钮文字  -->
+    <string name="btn_cancle">取消</string>
+    <string name="btn_submit">确定</string>
+
 </resources>

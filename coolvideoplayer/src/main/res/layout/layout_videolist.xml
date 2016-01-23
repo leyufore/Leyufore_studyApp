@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--视频列表 列表样式 界面 [可通用]-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent" 
+	android:orientation="vertical" android:background="@drawable/bg" >
+	
+	<ListView android:id="@id/android:list" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content" 
+		android:cacheColorHint="@color/listcachecolorhint"
+		android:listSelector="@drawable/list_selected_bg" 
+		android:divider="@drawable/list_divider" 
+		android:dividerHeight="2dip"
+		android:drawSelectorOnTop="false" />
+	<!--无数据显示文本-->
+	<TextView android:id="@id/android:empty" 
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content"
+		android:text="@string/msg_nodatamsg" 
+		android:textSize="20sp"
+		android:textColor="@color/deepyellow"
+		android:gravity="center_vertical|center_horizontal"
+		android:layout_centerHorizontal="true" />
+		
+</LinearLayout>

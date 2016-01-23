@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"  android:layout_height="fill_parent"
+    android:orientation="vertical" >    
+	<!-- 顶部广告显示区域 -->	
+	<TextView android:id="@+id/iv_main_adv" 
+		android:layout_width="fill_parent"	android:layout_height="40dip"
+		android:text="广告位招租" android:gravity="center"
+		android:background="@color/white" />    
+	<!-- 视频主显示区及播放控制区域 -->	
+	<FrameLayout android:id="@+id/fl_main" 
+		android:layout_width="fill_parent"	android:layout_height="fill_parent"	>	
+		<!-- 视频播放区域 -->	
+		<SurfaceView android:id="@+id/sv_main_screen" 
+			android:layout_width="fill_parent" 	android:layout_height="fill_parent"  />				
+		<!-- 播放控制区域 -->	
+	    <LinearLayout  android:orientation="horizontal"
+		    android:layout_width="fill_parent"   android:layout_height="wrap_content"
+		    android:gravity="center_horizontal"	android:layout_marginBottom="5dip"
+	    	android:layout_gravity="bottom" >
+			<!-- 播放、暂停按钮 -->	    	
+			<ImageButton android:id="@+id/ibtn_main_play" 
+				android:layout_height="wrap_content" android:layout_width="wrap_content"
+				android:background="@drawable/btn_mp_play"
+				android:onClick="onControlButtonClickHandler" />
+			<!-- 停止按钮 -->	    					
+			<ImageButton android:id="@+id/ibtn_main_eject" 
+				android:layout_height="wrap_content" android:layout_width="wrap_content"
+				android:layout_marginLeft="5dip" android:background="@drawable/btn_mp_stop" 
+				android:onClick="onControlButtonClickHandler" />
+			<!-- 视频选取按钮 -->	    									
+			<ImageButton android:id="@+id/ibtn_main_openlist" 
+				android:layout_height="wrap_content" android:layout_width="wrap_content" 
+				android:layout_marginLeft="5dip" android:background="@drawable/btn_mp_openlist"
+				android:onClick="onControlButtonClickHandler" />
+		</LinearLayout>						
+	</FrameLayout>			
+</LinearLayout>
