@@ -1,0 +1,82 @@
+[
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/bullet_or_tortoise_hit.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/bullet_or_tortoise_hit.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/level_3.ogg",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/level_3.ogg"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/bullet_2.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/bullet_2.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/dead.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/dead.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/jump.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/jump.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/pluslife.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/pluslife.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/bullet_1.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/bullet_1.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/gameover.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/gameover.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/level_1.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/level_1.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/coin.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/coin.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/hit.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/hit.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/step_on_enemy.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/step_on_enemy.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/menu.mid",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/menu.mid"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/top_of_food.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/top_of_food.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/level_4.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/level_4.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/button.ogg",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/button.ogg"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/level_win.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/level_win.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/no_time.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/no_time.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/eatfood.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/eatfood.mp3"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/raw/level_2.mp3",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/src/main/res/raw/level_2.mp3"
+    }
+]
