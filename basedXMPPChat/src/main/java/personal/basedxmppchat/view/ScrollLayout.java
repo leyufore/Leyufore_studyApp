@@ -284,6 +284,14 @@ public class ScrollLayout extends ViewGroup {
 			mTouchState = TOUCH_STATE_REST;
 			break;
 		}
+		/**
+		 * 状态设置主要在ACTION_MOVE时候,才会设置TOUCH_STATE_SCROLLING.ACTION_DOWN时候不会设置.
+         * 这样一个好处时,只有正在判断出处于水平触摸滑动时,才会进行垂直锁定(e.g. 这里会拦截事件,不传递给
+         * 子View.因此ListView,ExpandableView中的上下移动不会进行)
+         *
+         * 疑惑 : 子VIew中的上下移动怎么进行水平方向上的锁定
+         * learner : leyufore
+		 */
 		return mTouchState != TOUCH_STATE_REST;
 	}
 

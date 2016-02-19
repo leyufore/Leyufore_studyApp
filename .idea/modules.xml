@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Leyufore_studyApp.iml" filepath="$PROJECT_DIR$/Leyufore_studyApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/basedXMPPChat/basedXMPPChat.iml" filepath="$PROJECT_DIR$/basedXMPPChat/basedXMPPChat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/childGameSuperMary/childGameSuperMary.iml" filepath="$PROJECT_DIR$/childGameSuperMary/childGameSuperMary.iml" />
       <module fileurl="file://$PROJECT_DIR$/coolvideoplayer/coolvideoplayer.iml" filepath="$PROJECT_DIR$/coolvideoplayer/coolvideoplayer.iml" />
     </modules>
   </component>
