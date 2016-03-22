@@ -5,7 +5,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-<!--    <com.leyufore.tv_menu.customLayout.MultiColumnLayout
+    <com.leyufore.tv_menu.customLayout.MultiColumnLayout
         android:id="@+id/left_menu"
         android:layout_width="300px"
         android:layout_height="800px"
@@ -15,7 +15,7 @@
         leyufore:multi_column="1"
         leyufore:multi_item_height="100"
         leyufore:multi_item_width="300"
-        leyufore:multi_row="8" />-->
+        leyufore:multi_row="8" />
 
     <com.leyufore.tv_menu.customLayout.MultiColumnLayout
         android:id="@+id/multiColumnLayout"

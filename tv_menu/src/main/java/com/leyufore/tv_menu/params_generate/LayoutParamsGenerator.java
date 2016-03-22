@@ -2,6 +2,10 @@ package com.leyufore.tv_menu.params_generate;
 
 import android.widget.AbsoluteLayout;
 
+/**
+ * setAdapter时,进行初始化第一次View布局时,自动生成LayoutParams.
+ * 规则:一行一行排列
+ */
 public class LayoutParamsGenerator
 {
   private int column;

@@ -5,14 +5,16 @@ import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import java.util.List;
 
 import com.leyufore.tv_menu.R;
 import com.leyufore.tv_menu.model.ImageText;
+
+import java.util.List;
 
 public class ImageTextAdapter
   implements AdapterTemplate
@@ -49,7 +51,7 @@ public class ImageTextAdapter
       localTextView.setGravity(Gravity.CENTER);
       if (position == 0)
       {
-        ScaleAnimation scaleAnimation = new ScaleAnimation(1.0F, 1.1F, 1.0F, 1.1F, 1, 0.5F, 1, 0.5F);
+        ScaleAnimation scaleAnimation = new ScaleAnimation(1.0F, 1.1F, 1.0F, 1.1F, Animation.RELATIVE_TO_SELF, 0.5F, Animation.RELATIVE_TO_SELF, 0.5F);
         scaleAnimation.setFillAfter(true);
         linearLayout.startAnimation(scaleAnimation);
       }

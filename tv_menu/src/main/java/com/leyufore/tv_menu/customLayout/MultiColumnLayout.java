@@ -1,6 +1,5 @@
 package com.leyufore.tv_menu.customLayout;
 
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -14,33 +13,66 @@ import android.view.View;
 import android.widget.AbsoluteLayout;
 import android.widget.ImageView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.leyufore.tv_menu.R;
 import com.leyufore.tv_menu.adapter.AdapterTemplate;
 import com.leyufore.tv_menu.model.PositionTag;
 import com.leyufore.tv_menu.params_generate.LayoutParamsGenerator;
 import com.leyufore.tv_menu.util.LogU;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * whaley tv端 显示的行列固定,Item宽高固定的ViewGroup
+ * 采用继承AbsoluteLayout方式实现
+ * 问题:选择的View的动画紊乱,时有时无
+ * 原因:View在进行动画时,可能进行了回收利用,导致出错
+ * 方案: 1.获得的View开启动画 2.失去焦点的View结束动画 3.回收的View取消动画
+ * 滑动选择:
+ * 1.聚焦框移动 : 采用属性动画,改变了其实际位置,符合需求
+ * 2.ViewGroup内容块移动 : 采用ScrollTo方式,只改了其中的内容位置,而没有改变View位置.动画效果只会影响VIew位置,不符合要求
+ * 3.View获得失去焦点的动画 : 采用VIew动画,对View没有实际影响,感觉更适合需求.
+ */
 public class MultiColumnLayout extends AbsoluteLayout {
+    //移动方向常量
     public static final int DOWN = 2;
     public static final int UP = 1;
+    /**
+     * 保存所有的View,包括加到ViewGroup中的子View + RecycleBIn中的View,由于java引用的机制,全局只有一份对象,
+     * 只是有两处引用而已.
+     */
     private List<View> allViews;
     private Context context;
-    private AdapterTemplate mAdapter;
+    //mColumn,mRow,mItemHeight,mItemWidth显示的行列数,以及Item的宽高.在xml中提取
     private int mColumn;
-    private int mFocusCursor;
-    private ImageView mFocusImage;
+    private int mRow;
     private int mItemHeight;
     private int mItemWidth;
-    private int mLastSelectedColumn;
-    private int mLastSelectedRow;
-    private ObserverListener mObserverListener;
-    private RecycleBin mRecyle;
-    private int mRow;
+    //selectedColumn,selectedRow : 当前聚焦框所在行列位置
     private int mSelectedColumn;
     private int mSelectedRow;
+    /**
+     * FocusCursor : 用于判断内容块是否需要上下移动
+     * example: 触发内容块移动有两种情况
+     * 1.当前选择框在第1行,显示行数为3,此时FocusCursor为0. 继续向上移动,FocusCursor变为 -1 ,<0.则内容块需要向上移动,
+     * 并重置此时FocusCursor为0.重复
+     * 2.当前选择框在第3行,显示行数为3,此时FocusCursor为2. 继续向下移动,FocusCursor变为 3 ,=3.则内容块需要向下移动,
+     * 并重置此时FocusCursor为2.重复
+     * 3.当前选择框在第2行,显示行数为3,此时FocusCursor为1.上下移动变为0,2.既不 <0,也不 = 3,则内容快不需要移动
+     */
+    private int mFocusCursor;
+    //聚焦框.最好解耦出来
+    private ImageView mFocusImage;
+    //LastSelectedColumn LastSelectedRow : 记录上一次所选择的地方
+    private int mLastSelectedColumn;
+    private int mLastSelectedRow;
+    //对View进行回收利用. 本质上就是一个数据容器.回收时候加进去,加载时候取出来.
+    private RecycleBin mRecyle;
+    //自定义监听器. 为了让外部在有需要的时候,可以进行功能上的实现.如:在进行下一个选择的时候,让选择的View产生效果.为了外部方便.解耦
+    private ObserverListener mObserverListener;
+    //自定义适配器,存储数据,让外部提供子View,让ViewGroup与子View关系解耦
+    private AdapterTemplate mAdapter;
+    //setAdapter阶段初始化时,自动生成布局所需的LayoutParams
     private LayoutParamsGenerator paramsGenerator;
 
     public MultiColumnLayout(Context paramContext) {
@@ -72,16 +104,30 @@ public class MultiColumnLayout extends AbsoluteLayout {
         LogU.logE("3");
     }
 
+    /**
+     * 根据行列号,查找adapte中数据的位置.本质就是讲二维位置转化为一维位置
+     * @param row   行号
+     * @param column    列号
+     * @return  一维位置
+     */
     private int findPostitionInAdapterByRowAndColumn(int row, int column) {
         return -1 + ((-1 + (row + 1)) * this.mColumn + (column + 1));
     }
 
-    private int loadViewCount(int paramInt) {
-        if (paramInt == -1 + getMaxRow())
-            return this.mColumn - ((paramInt + 1) * this.mColumn - this.mAdapter.getCount());
+    /**
+     * 返回某一行应加载的View个数
+     * @param row   行号
+     * @return  某一行应加载的View个数
+     */
+    private int loadViewCount(int row) {
+        if (row == -1 + getMaxRow())
+            return this.mColumn - ((row + 1) * this.mColumn - this.mAdapter.getCount());
         return this.mColumn;
     }
 
+    /**
+     * 遍历一下自定义监听器中的方法,在需要时候进行调用,让外部可以实现功能上的需求
+     */
     private void observerFocusChange() {
         LogU.logE("animation start : ");
         LogU.logE("mLastSelectedRow: " + this.mLastSelectedRow);
@@ -99,9 +145,16 @@ public class MultiColumnLayout extends AbsoluteLayout {
         }
     }
 
+    /**
+     * 回收并加载View
+     * @param selectedRow   当前选择的行号
+     * @param selectedColumn    当前选择的列号
+     * @param direction 当前移动的方向
+     */
     private void recoveryAndLoad(int selectedRow, int selectedColumn, int direction) {
         switch (direction) {
-            case DOWN:
+            case DOWN:  //上移
+                //由于RecycleBin中初始容量为0,所以需要先回收再加载
                 if (selectedRow - (1 + this.mRow) >= 0) {
                     removeAndPushViews(selectedRow - (1 + this.mRow));
                     LogU.logE("after DOWN removeAndPushViews:");
@@ -111,7 +164,7 @@ public class MultiColumnLayout extends AbsoluteLayout {
                     loadAndPopViews(selectedRow + 1, selectedColumn);
                 }
                 break;
-            case UP:
+            case UP:    //下移
                 if (selectedRow + (1 + this.mRow) <= getMaxRow() - 1) {
                     removeAndPushViews(selectedRow + (1 + this.mRow));
                     LogU.logE("after UP removeAndPushViews:");
@@ -126,6 +179,7 @@ public class MultiColumnLayout extends AbsoluteLayout {
         }
     }
 
+    //由于容器中初始时就有聚焦框这个子View,所以添加的child都放在其前面
     public void addView(View child) {
         AbsoluteLayout.LayoutParams lp = this.paramsGenerator.getParams();
         addView(child, getChildCount() - 1, lp);
@@ -135,6 +189,9 @@ public class MultiColumnLayout extends AbsoluteLayout {
         addView(child, getChildCount() - 1, lp);
     }
 
+    /**
+     * 改变聚焦框显示隐藏状态
+     */
     public void changeFocusState() {
         if (this.mFocusImage.getVisibility() == GONE)
             this.mFocusImage.setVisibility(VISIBLE);
@@ -145,19 +202,33 @@ public class MultiColumnLayout extends AbsoluteLayout {
         }
     }
 
+    /**
+     * 移动逻辑:
+     * 1.先判断是否到内容边缘,是的话,则不移动
+     * 2.然后根据上下左右,改变mSelectedRow,mSelectedColumn的值,同时更新上一次选择的位置mLastSelectedRow,mLastSelectedColumn
+     * 3.再根据FocusCursor判断内容块是否需要移动,需要的话同时触发View回收利用
+     * 4.最后根据当前位置移动选择框
+     * @param keyEvent
+     * @return
+     */
     public boolean dispatchKeyEvent(KeyEvent keyEvent) {
+        //没数据则不处理
         if (this.mAdapter == null) {
             return false;
         }
+        //避免按一次按键,触发两次事件
         if (keyEvent.getAction() != KeyEvent.ACTION_UP) {
             return false;
         }
         switch (keyEvent.getKeyCode()) {
-            case KeyEvent.KEYCODE_DPAD_UP:
+            case KeyEvent.KEYCODE_DPAD_UP:  //按上键
                 if (this.mSelectedRow > 0) {    //未到达顶部
+                    //选择框出现移动时,更新最后一次选择的位置
                     this.mLastSelectedRow = this.mSelectedRow;
                     this.mLastSelectedColumn = this.mSelectedColumn;
+                    //当前选择行数--
                     this.mSelectedRow--;
+                    //行数浮标--
                     this.mFocusCursor--;
                     if (this.mFocusCursor < 0) {
                         this.mFocusCursor = 0;
@@ -238,9 +309,15 @@ public class MultiColumnLayout extends AbsoluteLayout {
 
     }
 
+    /**
+     * 此处就是引入allViews参数的原因.
+     * 如果使用的是getChildAt()的方式去寻找,可能由于View回收利用和重绘的关系.会出现紊乱,获取出错甚至是null.
+     * 于是引入一个稳定的参数
+     * @return  获取上一个选择的View
+     */
     public View getLastSelectedItem() {
         for (int i = 0; i < this.allViews.size(); i++) {
-            View localView = (View) this.allViews.get(i);
+            View localView =  this.allViews.get(i);
             PositionTag localPositionTag = (PositionTag) localView.getTag();
             if ((localPositionTag.getRow() == this.mLastSelectedRow) && (localPositionTag.getColumn() == this.mLastSelectedColumn))
                 return localView;
@@ -248,6 +325,9 @@ public class MultiColumnLayout extends AbsoluteLayout {
         return null;
     }
 
+    /**
+     * @return  获取最大行数
+     */
     public int getMaxRow() {
         int i = this.mAdapter.getCount() % this.mColumn;
         int j = this.mAdapter.getCount() / this.mColumn;
@@ -256,6 +336,9 @@ public class MultiColumnLayout extends AbsoluteLayout {
             return k + j;
     }
 
+    /**
+     * @return  获取当前选择的View
+     */
     public View getSelectedItem() {
         for (int i = 0; i < this.allViews.size(); i++) {
             View localView = (View) this.allViews.get(i);
@@ -267,12 +350,14 @@ public class MultiColumnLayout extends AbsoluteLayout {
     }
 
     public void init(Context context, AttributeSet attrs) {
+        //mColumn,mRow,mItemHeight,mItemWidth从xml中初始化过来
         TypedArray typeArray = context.obtainStyledAttributes(attrs, R.styleable.MultiColumnLayout);
         this.mColumn = typeArray.getInteger(R.styleable.MultiColumnLayout_multi_column, 1);
         this.mRow = typeArray.getInteger(R.styleable.MultiColumnLayout_multi_row, 2);
         this.mItemHeight = typeArray.getInteger(R.styleable.MultiColumnLayout_multi_item_height, 100);
         this.mItemWidth = typeArray.getInteger(R.styleable.MultiColumnLayout_multi_item_width, 100);
         this.paramsGenerator = new LayoutParamsGenerator(this.mColumn, this.mItemHeight, this.mItemWidth);
+
         this.mLastSelectedRow = -1;
         this.mLastSelectedColumn = -1;
         this.mSelectedRow = -1;
@@ -280,6 +365,7 @@ public class MultiColumnLayout extends AbsoluteLayout {
         this.mFocusCursor = -1;
         this.mRecyle = null;
         this.allViews = new ArrayList();
+        //聚焦框
         this.mFocusImage = new ImageView(context);
         if (Build.VERSION.SDK_INT > 23) {
             this.mFocusImage.setBackgroundColor(getResources().getColor(R.color.orange, null));
@@ -292,6 +378,11 @@ public class MultiColumnLayout extends AbsoluteLayout {
         addView(this.mFocusImage, localLayoutParams);
     }
 
+    /**
+     * 加载某一行的View
+     * @param selectedRow   所需加载的行号
+     * @param selectedColumn    未使用
+     */
     public void loadAndPopViews(int selectedRow, int selectedColumn) {
 
         for (int i = getChildCount() - 2; i >= 0; i--) {
@@ -302,11 +393,21 @@ public class MultiColumnLayout extends AbsoluteLayout {
         int loadViewCount = loadViewCount(selectedRow);
         for (int i = 0; i < loadViewCount; i++) {
             View view = this.mAdapter.getView(findPostitionInAdapterByRowAndColumn(selectedRow, i % this.mColumn), this.mRecyle.pop());
+            /**
+             * 设Tag,是为了在回收时,可以根据View的Tag中的行号来确定要回收哪些View
+             * View Tag - PostionTag - 记录了该View所在的行列号
+             */
             view.setTag(new PositionTag(selectedRow, i % this.mColumn));
             addView(view, new AbsoluteLayout.LayoutParams(this.mItemWidth, this.mItemHeight, i * this.mItemWidth, selectedRow * this.mItemHeight));
         }
     }
 
+    /**
+     * 内容块移动
+     * @param selectedRow   移动的行号
+     * @param showRow   显示的行数
+     * @param direction 移动的方向
+     */
     public void moveContent(int selectedRow, int showRow, int direction) {
         final int startY = getScrollY();
         final int endY;
@@ -331,6 +432,11 @@ public class MultiColumnLayout extends AbsoluteLayout {
         valueAnimator.start();
     }
 
+    /**
+     * 聚焦框移动
+     * @param selectedRow   行号
+     * @param selectedColumn    列号
+     */
     public void moveFocusImage(int selectedRow, int selectedColumn) {
         ObjectAnimator animator1 = ObjectAnimator.ofFloat(this.mFocusImage, "translationY",
                 this.mFocusImage.getTranslationY(),selectedRow * this.mItemHeight).setDuration(300);
@@ -342,6 +448,10 @@ public class MultiColumnLayout extends AbsoluteLayout {
         animatorSet.start();
     }
 
+    /**
+     * 回收某一行View
+     * @param selectedRow   行号
+     */
     public void removeAndPushViews(int selectedRow) {
         for (int i = -2 + getChildCount(); i >= 0; i--) {
             View localView = getChildAt(i);
@@ -355,12 +465,22 @@ public class MultiColumnLayout extends AbsoluteLayout {
         }
     }
 
+    /**
+     * 设置Adapter同时会对该ViewGroup进行所有参数的初始化.这相当是一个使用的入口.
+     * 该VIewGroup的使用范例:
+     * MultiColumnLayout layout = findViewById(..);
+     * layout.setAdapter(adapter,list);
+     * layout.setOnObserverListener(..);
+     * @param adapter
+     * @param visible   聚焦框是否可见
+     */
     public void setAdapter(AdapterTemplate adapter, int visible) {
         if ((adapter == null) || (adapter.getCount() == 0)) {
             LogU.logE("adapter is null or list in adapter is null");
             return;
         }
         this.mAdapter = adapter;
+        //初始化时应加载的VIew个数
         int loadViewCount = Math.min((2 + this.mRow) * this.mColumn, adapter.getCount());
         int row = -1;
         for (int i = 0; i < loadViewCount; i++) {
