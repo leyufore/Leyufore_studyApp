@@ -33,7 +33,7 @@ import java.util.List;
  * 2.ViewGroup内容块移动 : 采用ScrollTo方式,只改了其中的内容位置,而没有改变View位置.动画效果只会影响VIew位置,不符合要求
  * 3.View获得失去焦点的动画 : 采用VIew动画,对View没有实际影响,感觉更适合需求.
  */
-public class MultiColumnLayout extends AbsoluteLayout {
+public class MultiColumnLayoutDemo extends AbsoluteLayout {
     //移动方向常量
     public static final int DOWN = 2;
     public static final int UP = 1;
@@ -75,21 +75,21 @@ public class MultiColumnLayout extends AbsoluteLayout {
     //setAdapter阶段初始化时,自动生成布局所需的LayoutParams
     private LayoutParamsGenerator paramsGenerator;
 
-    public MultiColumnLayout(Context paramContext) {
+    public MultiColumnLayoutDemo(Context paramContext) {
         super(paramContext);
         this.context = paramContext;
         init(paramContext, null);
         LogU.logE("1");
     }
 
-    public MultiColumnLayout(Context paramContext, AttributeSet paramAttributeSet) {
+    public MultiColumnLayoutDemo(Context paramContext, AttributeSet paramAttributeSet) {
         super(paramContext, paramAttributeSet);
         this.context = paramContext;
         init(paramContext, paramAttributeSet);
         LogU.logE("2");
     }
 
-    public MultiColumnLayout(Context paramContext, AttributeSet paramAttributeSet, int paramInt) {
+    public MultiColumnLayoutDemo(Context paramContext, AttributeSet paramAttributeSet, int paramInt) {
         super(paramContext, paramAttributeSet, paramInt);
         this.context = paramContext;
         init(paramContext, paramAttributeSet);
@@ -97,7 +97,7 @@ public class MultiColumnLayout extends AbsoluteLayout {
     }
 
     @TargetApi(21)
-    public MultiColumnLayout(Context paramContext, AttributeSet paramAttributeSet, int paramInt1, int paramInt2) {
+    public MultiColumnLayoutDemo(Context paramContext, AttributeSet paramAttributeSet, int paramInt1, int paramInt2) {
         super(paramContext, paramAttributeSet, paramInt1, paramInt2);
         this.context = paramContext;
         init(paramContext, paramAttributeSet);
@@ -426,7 +426,7 @@ public class MultiColumnLayout extends AbsoluteLayout {
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator paramAnonymousValueAnimator) {
                 float fraction = valueAnimator.getAnimatedFraction();
-                MultiColumnLayout.this.scrollTo(0, startY + (int) (fraction * deltaY));
+                MultiColumnLayoutDemo.this.scrollTo(0, startY + (int) (fraction * deltaY));
             }
         });
         valueAnimator.start();
