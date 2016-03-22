@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MultiColumnLayout">
+        <attr name="multi_column" format="integer"/>
+        <attr name="multi_row" format="integer"/>
+        <attr name="multi_item_width" format="integer"/>
+        <attr name="multi_item_height" format="integer"/>
+    </declare-styleable>
+</resources>

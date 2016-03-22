@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:leyufore="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+<!--    <com.leyufore.tv_menu.customLayout.MultiColumnLayout
+        android:id="@+id/left_menu"
+        android:layout_width="300px"
+        android:layout_height="800px"
+        android:layout_x="0px"
+        android:layout_y="140px"
+        android:background="@android:color/holo_blue_light"
+        leyufore:multi_column="1"
+        leyufore:multi_item_height="100"
+        leyufore:multi_item_width="300"
+        leyufore:multi_row="8" />-->
+
+    <com.leyufore.tv_menu.customLayout.MultiColumnLayout
+        android:id="@+id/multiColumnLayout"
+        android:layout_width="1620px"
+        android:layout_height="800px"
+        android:layout_x="300px"
+        android:layout_y="140px"
+        android:background="@android:color/holo_blue_dark"
+        leyufore:multi_column="4"
+        leyufore:multi_item_height="400"
+        leyufore:multi_item_width="405"
+        leyufore:multi_row="2" />
+</AbsoluteLayout>

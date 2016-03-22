@@ -120,12 +120,12 @@
         "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/layout/abc_screen_toolbar.xml"
     },
     {
-        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/layout/abc_action_bar_title_item.xml",
-        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/layout/abc_action_bar_title_item.xml"
-    },
-    {
         "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/layout/select_dialog_item_material.xml",
         "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/layout/select_dialog_item_material.xml"
+    },
+    {
+        "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/layout/abc_action_bar_title_item.xml",
+        "source": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/layout/abc_action_bar_title_item.xml"
     },
     {
         "merged": "/Users/wenrule/Documents/AndroidStudioProjects/Leyufore_studyApp/childGameSuperMary/build/intermediates/res/merged/debug/layout/abc_screen_simple.xml",

@@ -7,6 +7,8 @@
       <module fileurl="file://$PROJECT_DIR$/basedXMPPChat/basedXMPPChat.iml" filepath="$PROJECT_DIR$/basedXMPPChat/basedXMPPChat.iml" />
       <module fileurl="file://$PROJECT_DIR$/childGameSuperMary/childGameSuperMary.iml" filepath="$PROJECT_DIR$/childGameSuperMary/childGameSuperMary.iml" />
       <module fileurl="file://$PROJECT_DIR$/coolvideoplayer/coolvideoplayer.iml" filepath="$PROJECT_DIR$/coolvideoplayer/coolvideoplayer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/myapplication/myapplication.iml" filepath="$PROJECT_DIR$/myapplication/myapplication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tv_menu/tv_menu.iml" filepath="$PROJECT_DIR$/tv_menu/tv_menu.iml" />
     </modules>
   </component>
 </project>
