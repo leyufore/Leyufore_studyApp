@@ -1,17 +1,13 @@
 package com.leyufore.tv_menu.customLayout;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AbsoluteLayout;
-import android.widget.ImageView;
 
 import com.leyufore.tv_menu.R;
 import com.leyufore.tv_menu.adapter.AdapterTemplate;
@@ -32,8 +28,11 @@ import java.util.List;
  * 1.聚焦框移动 : 采用属性动画,改变了其实际位置,符合需求
  * 2.ViewGroup内容块移动 : 采用ScrollTo方式,只改了其中的内容位置,而没有改变View位置.动画效果只会影响VIew位置,不符合要求
  * 3.View获得失去焦点的动画 : 采用VIew动画,对View没有实际影响,感觉更适合需求.
+ * Creator : leyufore
+ * Time : 2016/03/22
+ * 版本 : 学习版本
  */
-public class MultiColumnLayoutDemo extends AbsoluteLayout {
+public class MultiColumnLayoutTemplate extends AbsoluteLayout {
     //移动方向常量
     public static final int DOWN = 2;
     public static final int UP = 1;
@@ -41,16 +40,16 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
      * 保存所有的View,包括加到ViewGroup中的子View + RecycleBIn中的View,由于java引用的机制,全局只有一份对象,
      * 只是有两处引用而已.
      */
-    private List<View> allViews;
-    private Context context;
+    protected List<View> allViews;
+    protected Context context;
     //mColumn,mRow,mItemHeight,mItemWidth显示的行列数,以及Item的宽高.在xml中提取
-    private int mColumn;
-    private int mRow;
-    private int mItemHeight;
-    private int mItemWidth;
+    protected int mColumn;
+    protected int mRow;
+    protected int mItemHeight;
+    protected int mItemWidth;
     //selectedColumn,selectedRow : 当前聚焦框所在行列位置
-    private int mSelectedColumn;
-    private int mSelectedRow;
+    protected int mSelectedColumn;
+    protected int mSelectedRow;
     /**
      * FocusCursor : 用于判断内容块是否需要上下移动
      * example: 触发内容块移动有两种情况
@@ -60,47 +59,45 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
      * 并重置此时FocusCursor为2.重复
      * 3.当前选择框在第2行,显示行数为3,此时FocusCursor为1.上下移动变为0,2.既不 <0,也不 = 3,则内容快不需要移动
      */
-    private int mFocusCursor;
-    //聚焦框.最好解耦出来
-    private ImageView mFocusImage;
+    protected int mFocusCursor;
     //LastSelectedColumn LastSelectedRow : 记录上一次所选择的地方
-    private int mLastSelectedColumn;
-    private int mLastSelectedRow;
+    protected int mLastSelectedColumn;
+    protected int mLastSelectedRow;
     //对View进行回收利用. 本质上就是一个数据容器.回收时候加进去,加载时候取出来.
-    private RecycleBin mRecyle;
+    protected RecycleBin mRecyle;
     //自定义监听器. 为了让外部在有需要的时候,可以进行功能上的实现.如:在进行下一个选择的时候,让选择的View产生效果.为了外部方便.解耦
-    private ObserverListener mObserverListener;
+    protected ObserverListener mObserverListener;
     //自定义适配器,存储数据,让外部提供子View,让ViewGroup与子View关系解耦
-    private AdapterTemplate mAdapter;
+    protected AdapterTemplate mAdapter;
     //setAdapter阶段初始化时,自动生成布局所需的LayoutParams
-    private LayoutParamsGenerator paramsGenerator;
+    protected LayoutParamsGenerator paramsGenerator;
 
-    public MultiColumnLayoutDemo(Context paramContext) {
-        super(paramContext);
-        this.context = paramContext;
-        init(paramContext, null);
+    public MultiColumnLayoutTemplate(Context context) {
+        super(context);
+        this.context = context;
+        init(context, null);
         LogU.logE("1");
     }
 
-    public MultiColumnLayoutDemo(Context paramContext, AttributeSet paramAttributeSet) {
-        super(paramContext, paramAttributeSet);
-        this.context = paramContext;
-        init(paramContext, paramAttributeSet);
+    public MultiColumnLayoutTemplate(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        this.context = context;
+        init(context, attrs);
         LogU.logE("2");
     }
 
-    public MultiColumnLayoutDemo(Context paramContext, AttributeSet paramAttributeSet, int paramInt) {
-        super(paramContext, paramAttributeSet, paramInt);
-        this.context = paramContext;
-        init(paramContext, paramAttributeSet);
+    public MultiColumnLayoutTemplate(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        this.context = context;
+        init(context, attrs);
         LogU.logE("4");
     }
 
     @TargetApi(21)
-    public MultiColumnLayoutDemo(Context paramContext, AttributeSet paramAttributeSet, int paramInt1, int paramInt2) {
-        super(paramContext, paramAttributeSet, paramInt1, paramInt2);
-        this.context = paramContext;
-        init(paramContext, paramAttributeSet);
+    public MultiColumnLayoutTemplate(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        this.context = context;
+        init(context, attrs);
         LogU.logE("3");
     }
 
@@ -128,17 +125,17 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
     /**
      * 遍历一下自定义监听器中的方法,在需要时候进行调用,让外部可以实现功能上的需求
      */
-    private void observerFocusChange() {
-        LogU.logE("animation start : ");
+    protected void observerFocusChange() {
+/*        LogU.logE("animation start : ");
         LogU.logE("mLastSelectedRow: " + this.mLastSelectedRow);
         LogU.logE("mLastSelectedColumn : " + this.mLastSelectedColumn);
         LogU.logE("mSelectedRow : " + this.mSelectedRow);
-        LogU.logE("mSelectedColumn : " + this.mSelectedColumn);
+        LogU.logE("mSelectedColumn : " + this.mSelectedColumn);*/
         if ((this.mObserverListener != null) && ((this.mLastSelectedRow != this.mSelectedRow) || (this.mLastSelectedColumn != this.mSelectedColumn))) {
-            LogU.logE("allViews status:");
+//            LogU.logE("allViews status:");
             for (int i = 0; i < this.allViews.size(); i++) {
                 PositionTag localPositionTag = (PositionTag) ((View) this.allViews.get(i)).getTag();
-                LogU.logE(i + " " + localPositionTag.getRow() + " " + localPositionTag.getColumn());
+//                LogU.logE(i + " " + localPositionTag.getRow() + " " + localPositionTag.getColumn());
             }
             this.mObserverListener.itemSelected(getSelectedItem());
             this.mObserverListener.itemCancelSelected(getLastSelectedItem());
@@ -151,14 +148,14 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
      * @param selectedColumn    当前选择的列号
      * @param direction 当前移动的方向
      */
-    private void recoveryAndLoad(int selectedRow, int selectedColumn, int direction) {
+    protected void recoveryAndLoad(int selectedRow, int selectedColumn, int direction) {
         switch (direction) {
             case DOWN:  //上移
                 //由于RecycleBin中初始容量为0,所以需要先回收再加载
                 if (selectedRow - (1 + this.mRow) >= 0) {
                     removeAndPushViews(selectedRow - (1 + this.mRow));
-                    LogU.logE("after DOWN removeAndPushViews:");
-                    LogU.logE("Recycle bin size : " + this.mRecyle.size());
+//                    LogU.logE("after DOWN removeAndPushViews:");
+//                    LogU.logE("Recycle bin size : " + this.mRecyle.size());
                 }
                 if (selectedRow + 1 <= getMaxRow() - 1) {
                     loadAndPopViews(selectedRow + 1, selectedColumn);
@@ -167,8 +164,8 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
             case UP:    //下移
                 if (selectedRow + (1 + this.mRow) <= getMaxRow() - 1) {
                     removeAndPushViews(selectedRow + (1 + this.mRow));
-                    LogU.logE("after UP removeAndPushViews:");
-                    LogU.logE("Recycle bin size : " + this.mRecyle.size());
+//                    LogU.logE("after UP removeAndPushViews:");
+//                    LogU.logE("Recycle bin size : " + this.mRecyle.size());
                 }
                 if (selectedRow - 1 >= 0) {
                     loadAndPopViews(selectedRow - 1, selectedColumn);
@@ -176,29 +173,6 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
                 break;
             default:
                 return;
-        }
-    }
-
-    //由于容器中初始时就有聚焦框这个子View,所以添加的child都放在其前面
-    public void addView(View child) {
-        AbsoluteLayout.LayoutParams lp = this.paramsGenerator.getParams();
-        addView(child, getChildCount() - 1, lp);
-    }
-
-    public void addView(View child, AbsoluteLayout.LayoutParams lp) {
-        addView(child, getChildCount() - 1, lp);
-    }
-
-    /**
-     * 改变聚焦框显示隐藏状态
-     */
-    public void changeFocusState() {
-        if (this.mFocusImage.getVisibility() == GONE)
-            this.mFocusImage.setVisibility(VISIBLE);
-        else if (this.mFocusImage.getVisibility() == VISIBLE) {
-            this.mFocusImage.setVisibility(GONE);
-        } else {
-
         }
     }
 
@@ -236,8 +210,6 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
                         recoveryAndLoad(this.mSelectedRow, this.mSelectedColumn, UP);
                         moveContent(this.mSelectedRow, this.mRow, UP);
                     }
-                    //聚焦框移动
-                    moveFocusImage(this.mSelectedRow, this.mSelectedColumn);
                     //提供接口给外面,当选择Item改变时,外部可进行功能需求实现.便于解耦
                     observerFocusChange();
                 }
@@ -254,7 +226,6 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
                         recoveryAndLoad(this.mSelectedRow, this.mSelectedColumn, DOWN);
                         moveContent(this.mSelectedRow, this.mRow, DOWN);
                     }
-                    moveFocusImage(this.mSelectedRow, this.mSelectedColumn);
                     observerFocusChange();
                 }
                 return true;
@@ -277,7 +248,6 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
                 } else {
                     this.mSelectedColumn--;
                 }
-                moveFocusImage(this.mSelectedRow, this.mSelectedColumn);
                 observerFocusChange();
                 return true;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
@@ -299,7 +269,6 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
                 } else {
                     this.mSelectedColumn++;
                 }
-                moveFocusImage(this.mSelectedRow, this.mSelectedColumn);
                 observerFocusChange();
                 return true;
             case KeyEvent.KEYCODE_BACK:
@@ -365,17 +334,6 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
         this.mFocusCursor = -1;
         this.mRecyle = null;
         this.allViews = new ArrayList();
-        //聚焦框
-        this.mFocusImage = new ImageView(context);
-        if (Build.VERSION.SDK_INT > 23) {
-            this.mFocusImage.setBackgroundColor(getResources().getColor(R.color.orange, null));
-        } else {
-            this.mFocusImage.setBackgroundColor(getResources().getColor(R.color.orange));
-        }
-        this.mFocusImage.setAlpha(0.5f);
-        this.mFocusImage.setVisibility(GONE);
-        AbsoluteLayout.LayoutParams localLayoutParams = new AbsoluteLayout.LayoutParams(this.mItemWidth, this.mItemHeight, 0, 0);
-        addView(this.mFocusImage, localLayoutParams);
     }
 
     /**
@@ -385,7 +343,7 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
      */
     public void loadAndPopViews(int selectedRow, int selectedColumn) {
 
-        for (int i = getChildCount() - 2; i >= 0; i--) {
+        for (int i = getChildCount() - 1; i >= 0; i--) {
             if (((PositionTag) getChildAt(i).getTag()).getRow() == selectedRow) {
                 return;
             }
@@ -426,26 +384,10 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator paramAnonymousValueAnimator) {
                 float fraction = valueAnimator.getAnimatedFraction();
-                MultiColumnLayoutDemo.this.scrollTo(0, startY + (int) (fraction * deltaY));
+                MultiColumnLayoutTemplate.this.scrollTo(0, startY + (int) (fraction * deltaY));
             }
         });
         valueAnimator.start();
-    }
-
-    /**
-     * 聚焦框移动
-     * @param selectedRow   行号
-     * @param selectedColumn    列号
-     */
-    public void moveFocusImage(int selectedRow, int selectedColumn) {
-        ObjectAnimator animator1 = ObjectAnimator.ofFloat(this.mFocusImage, "translationY",
-                this.mFocusImage.getTranslationY(),selectedRow * this.mItemHeight).setDuration(300);
-        ObjectAnimator animator2 = ObjectAnimator.ofFloat(this.mFocusImage, "translationX",
-                this.mFocusImage.getTranslationX(), selectedColumn * this.mItemWidth);
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.setDuration(300L);
-        animatorSet.playTogether(animator1,animator2);
-        animatorSet.start();
     }
 
     /**
@@ -453,7 +395,7 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
      * @param selectedRow   行号
      */
     public void removeAndPushViews(int selectedRow) {
-        for (int i = -2 + getChildCount(); i >= 0; i--) {
+        for (int i =  getChildCount() - 1; i >= 0; i--) {
             View localView = getChildAt(i);
             if (localView.getAnimation() != null)
                 localView.getAnimation().cancel();
@@ -472,9 +414,8 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
      * layout.setAdapter(adapter,list);
      * layout.setOnObserverListener(..);
      * @param adapter
-     * @param visible   聚焦框是否可见
      */
-    public void setAdapter(AdapterTemplate adapter, int visible) {
+    public void setAdapter(AdapterTemplate adapter) {
         if ((adapter == null) || (adapter.getCount() == 0)) {
             LogU.logE("adapter is null or list in adapter is null");
             return;
@@ -488,7 +429,7 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
                 row++;
             View view = adapter.getView(i, null);
             view.setTag(new PositionTag(row, i % this.mColumn));
-            addView(view);
+            addView(view,this.paramsGenerator.getParams());
             this.allViews.add(view);
         }
         this.mLastSelectedRow = 0;
@@ -497,7 +438,6 @@ public class MultiColumnLayoutDemo extends AbsoluteLayout {
         this.mSelectedColumn = 0;
         this.mFocusCursor = 0;
         this.mRecyle = new RecycleBin();
-        this.mFocusImage.setVisibility(visible);
     }
 
     public void setOnObserverListener(ObserverListener paramObserverListener) {
