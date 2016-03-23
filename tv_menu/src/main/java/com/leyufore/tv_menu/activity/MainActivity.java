@@ -5,11 +5,14 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.ScaleAnimation;
 import android.widget.AbsoluteLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.leyufore.tv_menu.R;
 import com.leyufore.tv_menu.adapter.ImageTextAdapter;
@@ -24,7 +27,9 @@ import com.leyufore.tv_menu.model.ImageText;
 import com.leyufore.tv_menu.util.LogU;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends Activity {
     public static final int LEFT_MENU = 1;
@@ -33,6 +38,9 @@ public class MainActivity extends Activity {
 
     public static final int MENU_STATE_IN = 1;
     public static final int MENU_STATE_OUT = 2;
+
+    public static final int MSG_LOAD_DATA = 1;
+
     //在菜单进入显示前,哪个模块控制.
     private int lastController;
 
@@ -51,13 +59,26 @@ public class MainActivity extends Activity {
 
     private static List<String> left_menu_list = new ArrayList<>();
     private static List<String> rigth_menu_list = new ArrayList<>();
-    private static List<ImageText> content_list1 = new ArrayList<>();
-    private static List<ImageText> content_list2 = new ArrayList<>();
+    private static Map<Integer,List<ImageText>> content_map = new HashMap<>();
 
+    private Handler handler;
+
+    private ListView listView;
 
     protected void onCreate(Bundle paramBundle) {
         super.onCreate(paramBundle);
         setContentView(R.layout.activity_main);
+
+        handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                if(msg.what == MSG_LOAD_DATA){
+                    LogU.logE("400ms get message");
+                    imageTextAdapter.setList(content_map.get(msg.obj));
+                    content.setAdapter(imageTextAdapter);
+                }
+            }
+        };
 
         right_wrapper = (AbsoluteLayout) findViewById(R.id.right_wrapper);
 
@@ -72,15 +93,39 @@ public class MainActivity extends Activity {
     public void initData(){
         //初始化Content数据结合
         Drawable dog = getResources().getDrawable(R.drawable.dog, null);
+        List<ImageText> dogList = new ArrayList<>();
         for (int i = 0; i < 28; i++)
-            this.content_list1.add(new ImageText(dog, "leyufore" + i));
+            dogList.add(new ImageText(dog, "leyufore" + i));
         Drawable pad = getResources().getDrawable(R.drawable.pad, null);
+        List<ImageText> padList = new ArrayList<>();
         for (int i = 0; i < 13; i++)
-            this.content_list2.add(new ImageText(pad, "leyufore" + i));
+            padList.add(new ImageText(pad, "leyufore" + i));
+        Drawable flower = getResources().getDrawable(R.drawable.flower, null);
+        List<ImageText> flowerList = new ArrayList<>();
+        for (int i = 0; i < 5; i++)
+            flowerList.add(new ImageText(flower, "leyufore" + i));
+        Drawable love = getResources().getDrawable(R.drawable.pad, null);
+        List<ImageText> loveList = new ArrayList<>();
+        for (int i = 0; i < 2; i++)
+            loveList.add(new ImageText(love, "leyufore" + i));
+        Drawable sadStory = getResources().getDrawable(R.drawable.pad, null);
+        List<ImageText> sadStoryList = new ArrayList<>();
+        for (int i = 0; i < 10; i++)
+            sadStoryList.add(new ImageText(sadStory, "leyufore" + i));
+
+        this.content_map.put(0,dogList);
+        this.content_map.put(1,padList);
+        this.content_map.put(2,flowerList);
+        this.content_map.put(3,loveList);
+        this.content_map.put(4,sadStoryList);
 
         //初始化left_menu数据集合
-        for (int i = 0; i < 14; i++)
-            left_menu_list.add("leyufore" + i);
+        this.left_menu_list.add("dog");
+        this.left_menu_list.add("pad");
+        this.left_menu_list.add("flower");
+        this.left_menu_list.add("love");
+        this.left_menu_list.add("sadStory");
+
         //初始化right_menu数据集合
         this.rigth_menu_list.add("删除内容");
         this.rigth_menu_list.add("删除全部内容");
@@ -190,8 +235,7 @@ public class MainActivity extends Activity {
         ImageView focusImage = (ImageView) findViewById(R.id.content_focus_image);
         this.content = (Content) findViewById(R.id.content);
 
-        ArrayList<ImageText> list = new ArrayList<>(content_list1);
-        this.imageTextAdapter = new ImageTextAdapter(this.content.getContext(), list);
+        this.imageTextAdapter = new ImageTextAdapter(this.content.getContext(), content_map.get(1));
         this.content.setAdapter(this.imageTextAdapter);
         this.content.setFocusImage(focusImage,View.GONE);
         this.content.setOnObserverListener(new ObserverListener() {
@@ -246,8 +290,11 @@ public class MainActivity extends Activity {
         });
         this.left_menu.setNotifyLoadDataListener(new NotifyLoadDataListener() {
             @Override
-            public void loadData(int position) {
-                LogU.logE("position");
+            public void loadData(int selectedRow) {
+                handler.removeMessages(MSG_LOAD_DATA);
+                Message msg = handler.obtainMessage(MSG_LOAD_DATA);
+                msg.obj = selectedRow;
+                handler.sendMessageDelayed(msg,400);
             }
         });
     }

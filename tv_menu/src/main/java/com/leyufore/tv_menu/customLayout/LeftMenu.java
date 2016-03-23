@@ -1,15 +1,11 @@
 package com.leyufore.tv_menu.customLayout;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.widget.ImageView;
-
-import com.leyufore.tv_menu.util.LogU;
 
 /**
  * 左侧菜单栏
@@ -62,27 +58,23 @@ public class LeftMenu extends MultiColumnLayoutTemplate {
     }
 
     public void moveFocusImage(int focusRow, int focusColumn) {
+        /**
+         * 注意 : 当为AnimationSet设置监听器时,其中回调参数的animation就是animationSet.当其中所有的Animator
+         * 都结束时,才会进行回调.
+         * 由类图可知,AnimatiorSet是Animator的子类.
+         * learner : leyufore
+         */
         ObjectAnimator animator1 = ObjectAnimator.ofFloat(this.mFocusImage, "translationY",
                 this.mFocusImage.getTranslationY(), focusRow * this.mItemHeight);
         ObjectAnimator animator2 = ObjectAnimator.ofFloat(this.mFocusImage, "translationX",
                 this.mFocusImage.getTranslationX(), focusColumn * this.mItemWidth);
         AnimatorSet set = new AnimatorSet();
-        set.setDuration(2000);
+        set.setDuration(300);
         set.playTogether(animator1, animator2);
-        set.addListener(new AnimatorListenerAdapter(){
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if(mNotifyLoadDataListener != null){
-                    mNotifyLoadDataListener.loadData(LeftMenu.this.mSelectedRow);
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                LogU.logE("animator cancel");
-            }
-        });
         set.start();
+        if(mNotifyLoadDataListener != null){
+            mNotifyLoadDataListener.loadData(this.mSelectedRow);
+        }
     }
 
     @Override

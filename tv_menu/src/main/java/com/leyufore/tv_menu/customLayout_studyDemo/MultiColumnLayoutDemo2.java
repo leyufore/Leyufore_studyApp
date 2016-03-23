@@ -1,4 +1,4 @@
-package com.leyufore.tv_menu.customLayout;
+package com.leyufore.tv_menu.customLayout_studyDemo;
 
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
@@ -11,6 +11,8 @@ import android.widget.AbsoluteLayout;
 
 import com.leyufore.tv_menu.R;
 import com.leyufore.tv_menu.adapter.AdapterTemplate;
+import com.leyufore.tv_menu.customLayout.ObserverListener;
+import com.leyufore.tv_menu.customLayout.RecycleBin;
 import com.leyufore.tv_menu.model.PositionTag;
 import com.leyufore.tv_menu.observer.DataObserver;
 import com.leyufore.tv_menu.params_generate.LayoutParamsGenerator;
@@ -20,20 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * whaley tv端 显示的行列固定,Item宽高固定的ViewGroup
- * 采用继承AbsoluteLayout方式实现
- * 问题:选择的View的动画紊乱,时有时无
- * 原因:View在进行动画时,可能进行了回收利用,导致出错
- * 方案: 1.获得的View开启动画 2.失去焦点的View结束动画 3.回收的View取消动画
- * 滑动选择:
- * 1.聚焦框移动 : 采用属性动画,改变了其实际位置,符合需求
- * 2.ViewGroup内容块移动 : 采用ScrollTo方式,只改了其中的内容位置,而没有改变View位置.动画效果只会影响VIew位置,不符合要求
- * 3.View获得失去焦点的动画 : 采用VIew动画,对View没有实际影响,感觉更适合需求.
+ * 在学习版本1基础上移走了聚焦框
  * Creator : leyufore
  * Time : 2016/03/22
- * 版本 : 学习版本
+ * 版本 : 学习版本2
  */
-public class MultiColumnLayoutTemplate extends AbsoluteLayout {
+public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
     //移动方向常量
     public static final int DOWN = 2;
     public static final int UP = 1;
@@ -76,21 +70,21 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
     //setAdapter阶段初始化时,自动生成布局所需的LayoutParams
     protected LayoutParamsGenerator paramsGenerator;
 
-    public MultiColumnLayoutTemplate(Context context) {
+    public MultiColumnLayoutDemo2(Context context) {
         super(context);
         this.context = context;
         init(context, null);
         LogU.logE("1");
     }
 
-    public MultiColumnLayoutTemplate(Context context, AttributeSet attrs) {
+    public MultiColumnLayoutDemo2(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         init(context, attrs);
         LogU.logE("2");
     }
 
-    public MultiColumnLayoutTemplate(Context context, AttributeSet attrs, int defStyleAttr) {
+    public MultiColumnLayoutDemo2(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
         init(context, attrs);
@@ -98,7 +92,7 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
     }
 
     @TargetApi(21)
-    public MultiColumnLayoutTemplate(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public MultiColumnLayoutDemo2(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         this.context = context;
         init(context, attrs);
@@ -396,7 +390,7 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator paramAnonymousValueAnimator) {
                 float fraction = valueAnimator.getAnimatedFraction();
-                MultiColumnLayoutTemplate.this.scrollTo(0, startY + (int) (fraction * deltaY));
+                MultiColumnLayoutDemo2.this.scrollTo(0, startY + (int) (fraction * deltaY));
             }
         });
         valueAnimator.start();
