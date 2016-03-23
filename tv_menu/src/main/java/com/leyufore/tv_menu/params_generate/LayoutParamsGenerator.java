@@ -50,4 +50,10 @@ public class LayoutParamsGenerator
     int row = getNextRow();
     return new AbsoluteLayout.LayoutParams(this.width, this.height, column * this.width, row * this.height);
   }
+
+  public void reset(){
+    this.currentColumn = -1;
+    this.currentRow = -1;
+  }
+
 }

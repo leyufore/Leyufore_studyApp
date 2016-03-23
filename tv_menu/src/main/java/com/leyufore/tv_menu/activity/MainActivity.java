@@ -76,6 +76,8 @@ public class MainActivity extends Activity {
                     LogU.logE("400ms get message");
                     imageTextAdapter.setList(content_map.get(msg.obj));
                     content.setAdapter(imageTextAdapter);
+                    imageTextAdapter.notifyDataSetChange();
+                    content.resetFocusImage();
                 }
             }
         };
@@ -94,7 +96,7 @@ public class MainActivity extends Activity {
         //初始化Content数据结合
         Drawable dog = getResources().getDrawable(R.drawable.dog, null);
         List<ImageText> dogList = new ArrayList<>();
-        for (int i = 0; i < 28; i++)
+        for (int i = 0; i < 26; i++)
             dogList.add(new ImageText(dog, "leyufore" + i));
         Drawable pad = getResources().getDrawable(R.drawable.pad, null);
         List<ImageText> padList = new ArrayList<>();
@@ -104,11 +106,11 @@ public class MainActivity extends Activity {
         List<ImageText> flowerList = new ArrayList<>();
         for (int i = 0; i < 5; i++)
             flowerList.add(new ImageText(flower, "leyufore" + i));
-        Drawable love = getResources().getDrawable(R.drawable.pad, null);
+        Drawable love = getResources().getDrawable(R.drawable.love, null);
         List<ImageText> loveList = new ArrayList<>();
         for (int i = 0; i < 2; i++)
             loveList.add(new ImageText(love, "leyufore" + i));
-        Drawable sadStory = getResources().getDrawable(R.drawable.pad, null);
+        Drawable sadStory = getResources().getDrawable(R.drawable.sad, null);
         List<ImageText> sadStoryList = new ArrayList<>();
         for (int i = 0; i < 10; i++)
             sadStoryList.add(new ImageText(sadStory, "leyufore" + i));
@@ -235,7 +237,7 @@ public class MainActivity extends Activity {
         ImageView focusImage = (ImageView) findViewById(R.id.content_focus_image);
         this.content = (Content) findViewById(R.id.content);
 
-        this.imageTextAdapter = new ImageTextAdapter(this.content.getContext(), content_map.get(1));
+        this.imageTextAdapter = new ImageTextAdapter(this.content.getContext(), content_map.get(0));
         this.content.setAdapter(this.imageTextAdapter);
         this.content.setFocusImage(focusImage,View.GONE);
         this.content.setOnObserverListener(new ObserverListener() {
@@ -259,6 +261,7 @@ public class MainActivity extends Activity {
             public void listFocus() {
             }
         });
+        this.imageTextAdapter.notifyDataSetChange();
     }
 
     public void initLeftMenu() {
@@ -297,6 +300,7 @@ public class MainActivity extends Activity {
                 handler.sendMessageDelayed(msg,400);
             }
         });
+        this.leftMenuAdapter.notifyDataSetChange();
     }
 
     public void initRightMenu(){
@@ -324,7 +328,7 @@ public class MainActivity extends Activity {
             public void listFocus() {
             }
         });
-
+        this.rightMenuAdapter.notifyDataSetChange();
     }
 
     public void changeMainController(int controller){

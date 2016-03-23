@@ -5,10 +5,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
-import android.view.View;
 
-import com.leyufore.tv_menu.adapter.AdapterTemplate;
-import com.leyufore.tv_menu.model.PositionTag;
 import com.leyufore.tv_menu.util.LogU;
 
 /**
@@ -17,7 +14,7 @@ import com.leyufore.tv_menu.util.LogU;
 public class RightMenu extends MultiColumnLayoutTemplate {
 
     private int contentScrollDeltaYPosition = 0;
-    private int contentInitialDeltaY = 400;
+    private int contentInitialDeltaY = -400;
 
     public RightMenu(Context context) {
         super(context);
@@ -42,32 +39,8 @@ public class RightMenu extends MultiColumnLayoutTemplate {
     @Override
     public void init(Context context, AttributeSet attrs) {
         super.init(context, attrs);
+        LogU.logE("right menu init");
         this.scrollTo(0,-400);
-    }
-    @Override
-    public void setAdapter(AdapterTemplate adapter) {
-        if ((adapter == null) || (adapter.getCount() == 0)) {
-            LogU.logE("adapter is null or list in adapter is null");
-            return;
-        }
-        this.mAdapter = adapter;
-        //初始化时应加载的VIew个数
-        int loadViewCount = adapter.getCount();
-        int row = -1;
-        for (int i = 0; i < loadViewCount; i++) {
-            if (i % this.mColumn == 0)
-                row++;
-            View view = adapter.getView(i, null);
-            view.setTag(new PositionTag(row, i % this.mColumn));
-            addView(view,this.paramsGenerator.getParams());
-            this.allViews.add(view);
-        }
-        this.mLastSelectedRow = 0;
-        this.mLastSelectedColumn = 0;
-        this.mSelectedRow = 0;
-        this.mSelectedColumn = 0;
-        this.mFocusCursor = 0;
-        this.mRecyle = new RecycleBin();
     }
 
     public void moveContent(int direction) {

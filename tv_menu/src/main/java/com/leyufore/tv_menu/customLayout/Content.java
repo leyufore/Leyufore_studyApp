@@ -7,8 +7,6 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.widget.ImageView;
 
-import com.leyufore.tv_menu.util.LogU;
-
 /**
  * Created by wenrule on 16/3/22.
  */
@@ -60,7 +58,6 @@ public class Content extends MultiColumnLayoutTemplate {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent keyEvent) {
-        LogU.logE("content dispathce Key Event");
         //没数据则不处理
         if (this.mAdapter == null) {
             return false;
@@ -103,6 +100,15 @@ public class Content extends MultiColumnLayoutTemplate {
                         recoveryAndLoad(this.mSelectedRow, this.mSelectedColumn, DOWN);
                         moveContent(this.mSelectedRow, this.mRow, DOWN);
                     }
+                    /**
+                     * 特殊情况 :
+                     * 例子 : 按下时,选择位置移动到最后一行,而此时选择的列号为2.(列号标记为0,1,2....),而最后一行只有1个View.
+                     * 此时需要将当前所选择的列号赋值为最后一行的最后一个View的列号
+                     */
+
+                    if (this.mSelectedRow == getMaxRow() - 1 && this.mSelectedColumn >= loadViewCount(getMaxRow() - 1)) {
+                        this.mSelectedColumn = loadViewCount(getMaxRow() - 1) - 1;
+                    }
                     moveFocusImage(this.mFocusCursor, this.mSelectedColumn);
                     observerFocusChange();
                 }
@@ -130,7 +136,7 @@ public class Content extends MultiColumnLayoutTemplate {
                 observerFocusChange();
                 return true;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                if (this.mSelectedRow == getMaxRow() - 1 && this.mSelectedColumn == this.mColumn - 1) {
+                if (this.mSelectedRow == getMaxRow() - 1 && this.mSelectedColumn == loadViewCount(getMaxRow()-1) - 1) {
                     return true;
                 }
                 this.mLastSelectedRow = this.mSelectedRow;
@@ -171,6 +177,16 @@ public class Content extends MultiColumnLayoutTemplate {
         if(this.mObserverListener != null){
             this.mObserverListener.itemSelected(getSelectedItem());
         }
+    }
+
+    public void resetFocusImage(){
+        ObjectAnimator animator1 = ObjectAnimator.ofFloat(this.mFocusImage, "translationY",
+                this.mFocusImage.getTranslationY(),0);
+        ObjectAnimator animator2 = ObjectAnimator.ofFloat(this.mFocusImage, "translationX",
+                this.mFocusImage.getTranslationX(), 0);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animator1,animator2);
+        animatorSet.start();
     }
 
 }

@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.AbsoluteLayout;
 
 import com.leyufore.tv_menu.R;
-import com.leyufore.tv_menu.adapter.AdapterTemplate;
+import com.leyufore.tv_menu.adapter.AbsAdapterTemplate;
 import com.leyufore.tv_menu.model.PositionTag;
 import com.leyufore.tv_menu.observer.DataObserver;
 import com.leyufore.tv_menu.params_generate.LayoutParamsGenerator;
@@ -20,18 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * whaley tv端 显示的行列固定,Item宽高固定的ViewGroup
- * 采用继承AbsoluteLayout方式实现
- * 问题:选择的View的动画紊乱,时有时无
- * 原因:View在进行动画时,可能进行了回收利用,导致出错
- * 方案: 1.获得的View开启动画 2.失去焦点的View结束动画 3.回收的View取消动画
- * 滑动选择:
- * 1.聚焦框移动 : 采用属性动画,改变了其实际位置,符合需求
- * 2.ViewGroup内容块移动 : 采用ScrollTo方式,只改了其中的内容位置,而没有改变View位置.动画效果只会影响VIew位置,不符合要求
- * 3.View获得失去焦点的动画 : 采用VIew动画,对View没有实际影响,感觉更适合需求.
+ * 在版本2上进行了改进:
+ * 给MultiColumnTemplate,自定义Adapter应用观察者模式,使得可以使用notifyDataSetChange();
+ * 该VIewGroup的使用范例:
+ * MultiColumnLayout layout = findViewById(..);
+ * layout.setAdapter(adapter,list);
+ * layout.setOnObserverListener(..);
+ * adapter.notifyDataSetChange();
  * Creator : leyufore
- * Time : 2016/03/22
- * 版本 : 学习版本
+ * Time : 2016/03/23
+ * 版本 : 学习版本3
  */
 public class MultiColumnLayoutTemplate extends AbsoluteLayout {
     //移动方向常量
@@ -69,7 +67,7 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
     //自定义监听器. 为了让外部在有需要的时候,可以进行功能上的实现.如:在进行下一个选择的时候,让选择的View产生效果.为了外部方便.解耦
     protected ObserverListener mObserverListener;
     //自定义适配器,存储数据,让外部提供子View,让ViewGroup与子View关系解耦
-    protected AdapterTemplate mAdapter;
+    protected AbsAdapterTemplate mAdapter;
     //类似android里面的DataSetObserver接口.用于被观察者持有观察者的对象.使得在自定义adapter进行notifyDataChange调用时候,通知该Viewgroup进行变化
     protected DataObserver mDataObserver;
 
@@ -120,7 +118,7 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
      * @param row   行号
      * @return  某一行应加载的View个数
      */
-    private int loadViewCount(int row) {
+    protected int loadViewCount(int row) {
         if (row == -1 + getMaxRow())
             return this.mColumn - ((row + 1) * this.mColumn - this.mAdapter.getCount());
         return this.mColumn;
@@ -130,17 +128,17 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
      * 遍历一下自定义监听器中的方法,在需要时候进行调用,让外部可以实现功能上的需求
      */
     protected void observerFocusChange() {
-/*        LogU.logE("animation start : ");
-        LogU.logE("mLastSelectedRow: " + this.mLastSelectedRow);
-        LogU.logE("mLastSelectedColumn : " + this.mLastSelectedColumn);
-        LogU.logE("mSelectedRow : " + this.mSelectedRow);
-        LogU.logE("mSelectedColumn : " + this.mSelectedColumn);*/
+//        LogU.logE("animation start : ");
+        LogU.logE("mLastSelectedRow: " + this.mLastSelectedRow + " mLastSelectedColumn : " + this.mLastSelectedColumn);
+        LogU.logE("mSelectedRow : " + this.mSelectedRow + " mSelectedColumn : " + this.mSelectedColumn);
         if ((this.mObserverListener != null) && ((this.mLastSelectedRow != this.mSelectedRow) || (this.mLastSelectedColumn != this.mSelectedColumn))) {
 //            LogU.logE("allViews status:");
             for (int i = 0; i < this.allViews.size(); i++) {
                 PositionTag localPositionTag = (PositionTag) ((View) this.allViews.get(i)).getTag();
 //                LogU.logE(i + " " + localPositionTag.getRow() + " " + localPositionTag.getColumn());
             }
+            LogU.logE("observerFocusChange allViews size : " + this.allViews.size());
+            LogU.logE("getChildCount size : " + getChildCount());
             this.mObserverListener.itemSelected(getSelectedItem());
             this.mObserverListener.itemCancelSelected(getLastSelectedItem());
         }
@@ -230,6 +228,15 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
                         recoveryAndLoad(this.mSelectedRow, this.mSelectedColumn, DOWN);
                         moveContent(this.mSelectedRow, this.mRow, DOWN);
                     }
+                    /**
+                     * 特殊情况 :
+                     * 例子 : 按下时,选择位置移动到最后一行,而此时选择的列号为2.(列号标记为0,1,2....),而最后一行只有1个View.
+                     * 此时需要将当前所选择的列号赋值为最后一行的最后一个View的列号
+                     */
+
+                    if (this.mSelectedRow == getMaxRow() - 1 && this.mSelectedColumn >= loadViewCount(getMaxRow() - 1)) {
+                        this.mSelectedColumn = loadViewCount(getMaxRow() - 1) - 1;
+                    }
                     observerFocusChange();
                 }
                 return true;
@@ -255,7 +262,7 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
                 observerFocusChange();
                 return true;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                if (this.mSelectedRow == getMaxRow() - 1 && this.mSelectedColumn == this.mColumn - 1) {
+                if (this.mSelectedRow == getMaxRow() - 1 && this.mSelectedColumn == loadViewCount(getMaxRow()-1) - 1) {
                     return true;
                 }
                 this.mLastSelectedRow = this.mSelectedRow;
@@ -279,7 +286,6 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
             default:
                 return false;
         }
-
     }
 
     /**
@@ -302,11 +308,9 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
      * @return  获取最大行数
      */
     public int getMaxRow() {
-        int i = this.mAdapter.getCount() % this.mColumn;
-        int j = this.mAdapter.getCount() / this.mColumn;
-        if (i == 0) ;
-        for (int k = 0; ; k = 1)
-            return k + j;
+        int remainder = this.mAdapter.getCount() % this.mColumn;
+        int merchant = this.mAdapter.getCount() / this.mColumn;
+        return remainder == 0 ? merchant : merchant + 1;
     }
 
     /**
@@ -314,7 +318,7 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
      */
     public View getSelectedItem() {
         for (int i = 0; i < this.allViews.size(); i++) {
-            View localView = (View) this.allViews.get(i);
+            View localView = this.allViews.get(i);
             PositionTag localPositionTag = (PositionTag) localView.getTag();
             if ((localPositionTag.getRow() == this.mSelectedRow) && (localPositionTag.getColumn() == this.mSelectedColumn))
                 return localView;
@@ -342,8 +346,41 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
         this.mDataObserver = new DataObserver() {
             @Override
             public void onChange() {
-                //重新配置参数
-                //重新布局
+                /**
+                 * 清空原有内容
+                 * 重新配置参数
+                 * 重新布局
+                 */
+                removeAllViews();
+                if (mRecyle != null){
+                    mRecyle.clear();
+                }else{
+                    mRecyle = new RecycleBin();
+                }
+                allViews.clear();
+                if(paramsGenerator != null){
+                    //重置初始化时自动布局生成器里面的计数
+                    paramsGenerator.reset();
+                }
+                mLastSelectedRow = 0;
+                mLastSelectedColumn = 0;
+                mSelectedRow = 0;
+                mSelectedColumn = 0;
+                mFocusCursor = 0;
+                //初始化时应加载的VIew个数
+                int loadViewCount = Math.min((2 + mRow) * mColumn, mAdapter.getCount());
+                int row = -1;
+                for (int i = 0; i < loadViewCount; i++) {
+                    if (i % mColumn == 0)
+                        row++;
+                    View view = mAdapter.getView(i, null);
+                    view.setTag(new PositionTag(row, i % mColumn));
+                    addView(view,paramsGenerator.getParams());
+                    allViews.add(view);
+                }
+                //刷新页面后,重定位内容块.
+                //由于这里是加载了不同数据,所以内容块应与最初展现时一样,展现第一页,内容块滑到0,0处
+                scrollTo(0,0);
             }
         };
     }
@@ -420,36 +457,15 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
     }
 
     /**
-     * 设置Adapter同时会对该ViewGroup进行所有参数的初始化.这相当是一个使用的入口.
-     * 该VIewGroup的使用范例:
-     * MultiColumnLayout layout = findViewById(..);
-     * layout.setAdapter(adapter,list);
-     * layout.setOnObserverListener(..);
      * @param adapter
      */
-    public void setAdapter(AdapterTemplate adapter) {
+    public void setAdapter(AbsAdapterTemplate adapter) {
         if ((adapter == null) || (adapter.getCount() == 0)) {
             LogU.logE("adapter is null or list in adapter is null");
             return;
         }
         this.mAdapter = adapter;
-        //初始化时应加载的VIew个数
-        int loadViewCount = Math.min((2 + this.mRow) * this.mColumn, adapter.getCount());
-        int row = -1;
-        for (int i = 0; i < loadViewCount; i++) {
-            if (i % this.mColumn == 0)
-                row++;
-            View view = adapter.getView(i, null);
-            view.setTag(new PositionTag(row, i % this.mColumn));
-            addView(view,this.paramsGenerator.getParams());
-            this.allViews.add(view);
-        }
-        this.mLastSelectedRow = 0;
-        this.mLastSelectedColumn = 0;
-        this.mSelectedRow = 0;
-        this.mSelectedColumn = 0;
-        this.mFocusCursor = 0;
-        this.mRecyle = new RecycleBin();
+        this.mAdapter.setDataObserver(this.mDataObserver);
     }
 
     public void setOnObserverListener(ObserverListener paramObserverListener) {

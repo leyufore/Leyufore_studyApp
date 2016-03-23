@@ -101,9 +101,10 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
 
     /**
      * 根据行列号,查找adapte中数据的位置.本质就是讲二维位置转化为一维位置
-     * @param row   行号
-     * @param column    列号
-     * @return  一维位置
+     *
+     * @param row    行号
+     * @param column 列号
+     * @return 一维位置
      */
     private int findPostitionInAdapterByRowAndColumn(int row, int column) {
         return -1 + ((-1 + (row + 1)) * this.mColumn + (column + 1));
@@ -111,8 +112,9 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
 
     /**
      * 返回某一行应加载的View个数
-     * @param row   行号
-     * @return  某一行应加载的View个数
+     *
+     * @param row 行号
+     * @return 某一行应加载的View个数
      */
     private int loadViewCount(int row) {
         if (row == -1 + getMaxRow())
@@ -142,9 +144,10 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
 
     /**
      * 回收并加载View
-     * @param selectedRow   当前选择的行号
-     * @param selectedColumn    当前选择的列号
-     * @param direction 当前移动的方向
+     *
+     * @param selectedRow    当前选择的行号
+     * @param selectedColumn 当前选择的列号
+     * @param direction      当前移动的方向
      */
     protected void recoveryAndLoad(int selectedRow, int selectedColumn, int direction) {
         switch (direction) {
@@ -180,6 +183,7 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
      * 2.然后根据上下左右,改变mSelectedRow,mSelectedColumn的值,同时更新上一次选择的位置mLastSelectedRow,mLastSelectedColumn
      * 3.再根据FocusCursor判断内容块是否需要移动,需要的话同时触发View回收利用
      * 4.最后根据当前位置移动选择框
+     *
      * @param keyEvent
      * @return
      */
@@ -224,6 +228,15 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
                         recoveryAndLoad(this.mSelectedRow, this.mSelectedColumn, DOWN);
                         moveContent(this.mSelectedRow, this.mRow, DOWN);
                     }
+                    /**
+                     * 特殊情况 :
+                     * 例子 : 按下时,选择位置移动到最后一行,而此时选择的列号为2.(列号标记为0,1,2....),而最后一行只有1个View.
+                     * 此时需要将当前所选择的列号赋值为最后一行的最后一个View的列号
+                     */
+
+                    if (this.mSelectedRow == getMaxRow() - 1 && this.mSelectedColumn >= loadViewCount(getMaxRow() - 1)) {
+                        this.mSelectedColumn = loadViewCount(getMaxRow() - 1) - 1;
+                    }
                     observerFocusChange();
                 }
                 return true;
@@ -249,7 +262,7 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
                 observerFocusChange();
                 return true;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                if (this.mSelectedRow == getMaxRow() - 1 && this.mSelectedColumn == this.mColumn - 1) {
+                if (this.mSelectedRow == getMaxRow() - 1 && this.mSelectedColumn == loadViewCount(getMaxRow()-1) - 1) {
                     return true;
                 }
                 this.mLastSelectedRow = this.mSelectedRow;
@@ -280,11 +293,12 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
      * 此处就是引入allViews参数的原因.
      * 如果使用的是getChildAt()的方式去寻找,可能由于View回收利用和重绘的关系.会出现紊乱,获取出错甚至是null.
      * 于是引入一个稳定的参数
-     * @return  获取上一个选择的View
+     *
+     * @return 获取上一个选择的View
      */
     public View getLastSelectedItem() {
         for (int i = 0; i < this.allViews.size(); i++) {
-            View localView =  this.allViews.get(i);
+            View localView = this.allViews.get(i);
             PositionTag localPositionTag = (PositionTag) localView.getTag();
             if ((localPositionTag.getRow() == this.mLastSelectedRow) && (localPositionTag.getColumn() == this.mLastSelectedColumn))
                 return localView;
@@ -293,18 +307,16 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
     }
 
     /**
-     * @return  获取最大行数
+     * @return 获取最大行数
      */
     public int getMaxRow() {
-        int i = this.mAdapter.getCount() % this.mColumn;
-        int j = this.mAdapter.getCount() / this.mColumn;
-        if (i == 0) ;
-        for (int k = 0; ; k = 1)
-            return k + j;
+        int remainder = this.mAdapter.getCount() % this.mColumn;
+        int merchant = this.mAdapter.getCount() / this.mColumn;
+        return remainder == 0 ? merchant : merchant + 1;
     }
 
     /**
-     * @return  获取当前选择的View
+     * @return 获取当前选择的View
      */
     public View getSelectedItem() {
         for (int i = 0; i < this.allViews.size(); i++) {
@@ -344,8 +356,9 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
 
     /**
      * 加载某一行的View
-     * @param selectedRow   所需加载的行号
-     * @param selectedColumn    未使用
+     *
+     * @param selectedRow    所需加载的行号
+     * @param selectedColumn 未使用
      */
     public void loadAndPopViews(int selectedRow, int selectedColumn) {
 
@@ -368,14 +381,15 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
 
     /**
      * 内容块移动
-     * @param selectedRow   移动的行号
-     * @param showRow   显示的行数
-     * @param direction 移动的方向
+     *
+     * @param selectedRow 移动的行号
+     * @param showRow     显示的行数
+     * @param direction   移动的方向
      */
     public void moveContent(int selectedRow, int showRow, int direction) {
         final int startY = getScrollY();
         final int endY;
-        switch (direction){
+        switch (direction) {
             case DOWN:
                 endY = (selectedRow - (showRow - 1)) * this.mItemHeight;
                 break;
@@ -386,7 +400,7 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
                 return;
         }
         final int deltaY = endY - startY;
-        final ValueAnimator valueAnimator = ValueAnimator.ofInt(0,1).setDuration(300);
+        final ValueAnimator valueAnimator = ValueAnimator.ofInt(0, 1).setDuration(300);
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator paramAnonymousValueAnimator) {
                 float fraction = valueAnimator.getAnimatedFraction();
@@ -398,10 +412,11 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
 
     /**
      * 回收某一行View
-     * @param selectedRow   行号
+     *
+     * @param selectedRow 行号
      */
     public void removeAndPushViews(int selectedRow) {
-        for (int i =  getChildCount() - 1; i >= 0; i--) {
+        for (int i = getChildCount() - 1; i >= 0; i--) {
             View localView = getChildAt(i);
             if (localView.getAnimation() != null)
                 localView.getAnimation().cancel();
@@ -419,6 +434,7 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
      * MultiColumnLayout layout = findViewById(..);
      * layout.setAdapter(adapter,list);
      * layout.setOnObserverListener(..);
+     *
      * @param adapter
      */
     public void setAdapter(AdapterTemplate adapter) {
@@ -435,7 +451,7 @@ public class MultiColumnLayoutDemo2 extends AbsoluteLayout {
                 row++;
             View view = adapter.getView(i, null);
             view.setTag(new PositionTag(row, i % this.mColumn));
-            addView(view,this.paramsGenerator.getParams());
+            addView(view, this.paramsGenerator.getParams());
             this.allViews.add(view);
         }
         this.mLastSelectedRow = 0;

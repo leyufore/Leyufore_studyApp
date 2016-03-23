@@ -10,8 +10,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class RightMenuAdapter
-        implements AdapterTemplate {
+public class RightMenuAdapter extends AbsAdapterTemplate{
     private Context context;
     private List<String> list;
 

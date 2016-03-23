@@ -9,8 +9,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class LeftMenuAdapter
-        implements AdapterTemplate {
+public class LeftMenuAdapter extends AbsAdapterTemplate{
     private Context context;
     private List<String> list;
 

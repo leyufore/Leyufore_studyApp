@@ -14,8 +14,7 @@ import com.leyufore.tv_menu.model.ImageText;
 
 import java.util.List;
 
-public class ImageTextAdapter
-  implements AdapterTemplate
+public class ImageTextAdapter extends AbsAdapterTemplate
 {
   private Context context;
   private List<ImageText> list;
