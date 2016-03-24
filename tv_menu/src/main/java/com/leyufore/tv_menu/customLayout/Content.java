@@ -5,7 +5,14 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.ImageView;
+
+import com.leyufore.tv_menu.adapter.ImageTextAdapter;
+import com.leyufore.tv_menu.model.ImageText;
+import com.leyufore.tv_menu.model.PositionTag;
+import com.leyufore.tv_menu.observer.DataObserver;
+import com.leyufore.tv_menu.util.LogU;
 
 /**
  * Created by wenrule on 16/3/22.
@@ -13,6 +20,7 @@ import android.widget.ImageView;
 public class Content extends MultiColumnLayoutTemplate {
 
     private ImageView mFocusImage;
+    private int state = ImageTextAdapter.STATE_NORMAL;
 
     public Content(Context context) {
         super(context);
@@ -179,6 +187,9 @@ public class Content extends MultiColumnLayoutTemplate {
         }
     }
 
+    /**
+     *  当使用notifyDataSetChange时,聚焦框应该也把位置重置为0,0处
+     */
     public void resetFocusImage(){
         ObjectAnimator animator1 = ObjectAnimator.ofFloat(this.mFocusImage, "translationY",
                 this.mFocusImage.getTranslationY(),0);
@@ -187,6 +198,111 @@ public class Content extends MultiColumnLayoutTemplate {
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(animator1,animator2);
         animatorSet.start();
+    }
+
+    /**
+     * @return  当前内容块状态
+     */
+    public int getState(){
+        return state;
+    }
+
+    /**
+     * 改变内容块的状态
+     */
+    public void setState(int state){
+        this.state = state;
+        if(getChildCount() == 0) {
+            return;
+        }
+        if(state == ImageTextAdapter.STATE_EDIT) {      //编辑状态
+            for (int i = 0; i < getChildCount(); i++) {
+                getChildAt(i).setAlpha(0.5f);
+            }
+            if(mObserverListener != null){
+                mObserverListener.itemSelected(getSelectedItem());
+            }
+        }else{      //正常显示状态
+            for (int i = 0; i < getChildCount(); i++) {
+                getChildAt(i).setAlpha(1f);
+            }
+            if(mObserverListener != null){
+                mObserverListener.itemSelected(getSelectedItem());
+            }
+        }
+
+    }
+    /**
+     * 该方法是为了实现外部需求而提供的,返回当前选择项的数据的位置
+     */
+    public int getSelectedPosition(){
+        return findPostitionInAdapterByRowAndColumn(this.mSelectedRow,this.mSelectedColumn);
+    }
+
+    /**
+     * 编辑模式下删除某个项
+     */
+    public void removeViewInEditState(){
+       /* * 1.改变数据
+                * 2.刷新视图  - notifyDataSetChange()
+                * 3.重定位到相应位置
+                * 4.聚焦框移动到相应位置
+                * */
+
+        boolean lastOne = false;
+        //删除的是最后一个时特殊处理
+        if(this.mSelectedRow == getMaxRow() - 1 && this.mSelectedColumn == loadViewCount(this.mSelectedRow)-1){
+            lastOne = true;
+        }
+
+        ImageTextAdapter imageTextAdapter = (ImageTextAdapter)this.mAdapter;
+        int deletePosition = findPostitionInAdapterByRowAndColumn(this.mSelectedRow,this.mSelectedColumn);
+        imageTextAdapter.deleteData(deletePosition);
+
+        for(int i = getChildCount() - 1; i >=0; i--){
+            View child = getChildAt(i);
+            if (child.getAnimation() != null)
+                child.getAnimation().cancel();
+            child.clearAnimation();
+            child.setTag(new PositionTag(-1,-1));
+            this.mRecyle.push(child);
+            removeViewAt(i);
+        }
+
+        int loadRow = this.mSelectedRow - (this.mFocusCursor + 1);
+        LogU.logE("selectedROw : " + this.mSelectedRow + " mFocusCUrsor : " + this.mFocusCursor);
+        for(int i = 0 ; i < this.mRow + 2; i++){
+            LogU.logE("loadAndPopViews mROw :" + this.mRow + " loadROw : "+ loadRow);
+            loadAndPopViews(loadRow,this.mSelectedColumn);
+            loadRow++;
+        }
+        for(int i = 0;i < getChildCount();i++){
+            getChildAt(i).setAlpha(0.5f);
+        }
+        if(lastOne){
+            if(this.mSelectedColumn != 0){  //当前选择不是第一列
+                this.mSelectedColumn--;
+            }else{  //当前选择是第一列时
+                if(this.mSelectedRow  == 0) {   //当前选择是第一行第一个,此时什么都不做,隐藏聚焦框
+                    this.mFocusImage.setVisibility(GONE);
+                    return;
+                }   //当前选择不是第一行,但是第一列,此时行数-1,列号变为最后一个
+                this.mSelectedRow--;
+                this.mSelectedColumn = this.mColumn -1;
+                if(this.mFocusCursor == 0){ //当前选择的是第一列同时也是显示第一行
+                    loadAndPopViews(this.mSelectedRow - 1,this.mSelectedColumn);
+                    moveContent(this.mSelectedRow - (this.mRow - 1),this.mRow,UP);
+                    this.mFocusCursor = this.mRow - 1;
+                }else{
+                    this.mFocusCursor--;
+                }
+            }
+        }
+        moveFocusImage(this.mFocusCursor, this.mSelectedColumn);
+
+        if(mObserverListener != null){
+            mObserverListener.itemSelected(getSelectedItem());
+        }
     }
 
 }

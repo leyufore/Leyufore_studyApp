@@ -109,7 +109,7 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
      * @param column    列号
      * @return  一维位置
      */
-    private int findPostitionInAdapterByRowAndColumn(int row, int column) {
+    protected int findPostitionInAdapterByRowAndColumn(int row, int column) {
         return -1 + ((-1 + (row + 1)) * this.mColumn + (column + 1));
     }
 
@@ -119,6 +119,8 @@ public class MultiColumnLayoutTemplate extends AbsoluteLayout {
      * @return  某一行应加载的View个数
      */
     protected int loadViewCount(int row) {
+        if (row < 0 || row > getMaxRow() -1)   //小于第一行或是大于最大行则不加载
+            return 0;
         if (row == -1 + getMaxRow())
             return this.mColumn - ((row + 1) * this.mColumn - this.mAdapter.getCount());
         return this.mColumn;

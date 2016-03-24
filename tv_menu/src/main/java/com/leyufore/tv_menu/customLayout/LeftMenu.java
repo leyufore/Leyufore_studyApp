@@ -133,5 +133,12 @@ public class LeftMenu extends MultiColumnLayoutTemplate {
                 return false;
         }
     }
+
+    /**
+     * 该方法是为了实现外部需求而提供的,返回当前选择项的数据的位置
+     */
+    public int getSelectedPosition(){
+        return findPostitionInAdapterByRowAndColumn(this.mSelectedRow,this.mSelectedColumn);
+    }
 }
 

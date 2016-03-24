@@ -9,6 +9,11 @@ import android.view.KeyEvent;
 import com.leyufore.tv_menu.util.LogU;
 
 /**
+ * 此处由于数量比较少,此处直接不考虑回收,把移动过程中回收代码收掉
+ * bug : 由于在MultiColumnLayoutTemplate初始化时,加载VIew的数量并不一定就是全部的子View,
+ * 因此可能导致添加数量过多时,程序做动画在null对象上.
+ * 此处避免麻烦,不再做修改.由于其实右侧菜单应该直接做的,没有继承MultiColumnLayoutTemplate的必要,
+ * 继承了反而多了很多不必要的麻烦
  * Created by wenrule on 16/3/22.
  */
 public class RightMenu extends MultiColumnLayoutTemplate {
@@ -37,9 +42,8 @@ public class RightMenu extends MultiColumnLayoutTemplate {
     }
 
     @Override
-    public void init(Context context, AttributeSet attrs) {
-        super.init(context, attrs);
-        LogU.logE("right menu init");
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
         this.scrollTo(0,-400);
     }
 

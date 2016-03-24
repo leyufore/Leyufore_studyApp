@@ -9,6 +9,7 @@ public abstract class AbsAdapterTemplate implements AdapterTemplate{
 
     private DataObserver mDataObserver;
 
+
     public void notifyDataSetChange(){
         if(mDataObserver != null){
             mDataObserver.onChange();
@@ -18,5 +19,7 @@ public abstract class AbsAdapterTemplate implements AdapterTemplate{
     public void setDataObserver(DataObserver dataObserver){
         this.mDataObserver = dataObserver;
     }
+
+
 
 }
