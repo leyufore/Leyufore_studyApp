@@ -1,1 +1,1 @@
-include ':app', ':basedXMPPChat', ':coolvideoplayer', ':tv_menu', 'childGameSuperMary'
+include ':app', ':basedXMPPChat', ':coolvideoplayer', ':tv_menu', ':tv_child', 'childGameSuperMary'
