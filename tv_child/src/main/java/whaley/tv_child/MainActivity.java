@@ -22,12 +22,29 @@ public class MainActivity extends Activity {
     private int viewController = HOMEPAGE_VIEW;
 
     /**
-     * homePage,alarmPage的使用
+     * homePage,alarmPage的使用是为了减免每一次使用HomePage.getHomePage(MainActivity.this)的使用,由于该方法是同步方法,所以避免消耗
      */
     private HomePage homePage;
     private AlarmPage alarmPage;
     public View homePage_view;
     public View alarmPage_view;
+
+    private HomePage.HomePageEventListener homePageEventListener= new HomePage.HomePageEventListener(){
+
+        @Override
+        public void onGoToAlarm() {
+            setContentView(alarmPage_view);
+            MainActivity.this.viewController = ALARMPAGE_VIEW;
+        }
+    };
+
+    private AlarmPage.AlarmPageEventListener alarmPageEventListener = new AlarmPage.AlarmPageEventListener() {
+        @Override
+        public void onBack() {
+            setContentView(homePage_view);
+            MainActivity.this.viewController = HOMEPAGE_VIEW;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +71,9 @@ public class MainActivity extends Activity {
         alarmPage = AlarmPage.getAlarmPage(this);
         homePage_view = homePage.getContentView();
         alarmPage_view = alarmPage.getContentView();
+
+        homePage.setHomePageEventListener(homePageEventListener);
+        alarmPage.setAlarmPageEventListener(alarmPageEventListener);
 
         //设置为首页
         setContentView(homePage_view);
@@ -122,24 +142,16 @@ public class MainActivity extends Activity {
                 this.finish();
                 return true;
             }
-            if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER){ //确认闹钟时,填充闹钟界面的View
-                if(homePage.getCurrentController() == HomePage.ALARM){
-                    LogError.error("alarm selet");
-                    setContentView(alarmPage_view);
-                    this.viewController = ALARMPAGE_VIEW;
-                    return true;
-                }
-            }
             return homePage.dispatchKeyEvent(event);
         }else if(this.viewController == ALARMPAGE_VIEW){
-            if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) { //确认返回时,填充首页界面的View
-                if (alarmPage.getCurrentController() == AlarmPage.BACK) {
-                    setContentView(homePage_view);
-                    this.viewController = HOMEPAGE_VIEW;
-                    alarmPage.back();
-                    return true;
-                }
-            }
+//            if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) { //确认返回时,填充首页界面的View
+//                if (alarmPage.getCurrentController() == AlarmPage.BACK) {
+//                    setContentView(homePage_view);
+//                    this.viewController = HOMEPAGE_VIEW;
+//                    alarmPage.back();
+//                    return true;
+//                }
+//            }
             return alarmPage.dispatchKeyEvent(event);
         }else{
         }

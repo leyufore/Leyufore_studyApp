@@ -49,6 +49,18 @@ public class HomePage {
     private Context context;
     private ViewGroup contentView;
 
+    private HomePageEventListener homePageEventListener;
+
+    public interface HomePageEventListener{
+        void onGoToAlarm();
+    }
+
+    public void setHomePageEventListener(HomePageEventListener homePageEventListener){
+        if(homePageEventListener != null){
+            this.homePageEventListener = homePageEventListener;
+        }
+    }
+
     //方向
     /**
      * 此处不用final设置为常量的话,switch中是无法使用的
@@ -342,7 +354,20 @@ public class HomePage {
                 }
                 break;
             case OK:
-                break;
+                switch (currentController) {
+                    case TUIJIAN:   //推荐
+                    case SHOUCANG:  //收藏
+                    case DONGHUA:   //动画
+                    case ERGE:  //儿歌
+                        return true;
+                    case ALARM: //闹钟
+                        if(homePageEventListener != null){
+                            homePageEventListener.onGoToAlarm();
+                        }
+                        return true;
+                    default:
+                        break;
+                }
             default:
                 break;
         }

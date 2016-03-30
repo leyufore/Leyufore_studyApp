@@ -39,6 +39,19 @@ public class AlarmPage {
 
     private Context context;
     private ViewGroup contentView;
+
+    private  AlarmPageEventListener alarmPageEventListener;
+
+    public interface AlarmPageEventListener {
+        void onBack();
+    }
+
+    public void setAlarmPageEventListener(AlarmPageEventListener alarmPageEventListener){
+        if(alarmPageEventListener != null){
+            this.alarmPageEventListener = alarmPageEventListener;
+        }
+    }
+
     //方向
     /**
      * 此处不用final设置为常量的话,switch中是无法使用的
@@ -440,6 +453,12 @@ public class AlarmPage {
                     case LEFT:
                     case RIGHT:
                         return true;
+                    case OK:
+                        if(alarmPageEventListener != null){
+                            alarmPageEventListener.onBack();
+                            back();
+                        }
+                        return true;
                     default:
                         break;
                 }
@@ -470,11 +489,11 @@ public class AlarmPage {
 
     public void back() {
         setBackItemLostFocus();
-        this.controller = upDownChangeRecord;
+        this.controller = lastSelected;
         if(this.controller == TIME_CUSTOM){
-            setTimeCustomFocus(viewGroups[controller], bgGroups[controller], focusGroups[controller],operation_prompt);
+            setTimeCustomFocus(viewGroups[lastSelected], bgGroups[lastSelected], focusGroups[lastSelected],operation_prompt);
         }else {
-            setItemFocus(viewGroups[controller], bgGroups[controller], focusGroups[controller]);
+            setItemFocus(viewGroups[lastSelected], bgGroups[lastSelected], focusGroups[lastSelected]);
         }
     }
 
